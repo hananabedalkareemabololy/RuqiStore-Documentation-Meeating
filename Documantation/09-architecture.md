@@ -82,7 +82,7 @@ graph TB
 
 This diagram illustrates the main components of the Ruqi Store monolithic ASP.NET Core MVC application and how requests flow from the browser through controllers, services, repositories, and Entity Framework Core to the database.
 
-```
+
 ```mermaid
 graph LR
 
