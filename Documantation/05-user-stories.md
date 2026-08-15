@@ -379,3 +379,81 @@ block-beta
     G3[" "]
     G4[" "]
     G5["US-019 Reports & Audit Logs"]
+---
+
+## 5.4 Priority Summary
+
+| Priority | Story Count | Description |
+| :--- | :---: | :--- |
+| **Must Have** | 16 | Core authentication, catalog, cart, checkout, orders, payments, reviews, store management, and administration. |
+| **Should Have** | 3 | Profile/address management and supporting customer functionality. |
+| **Could Have** | 0 | No additional optional features are included in the current release scope. |
+| **Won't Have** | — | Wishlist, showroom/appointment booking, native mobile application, and external payment gateway integration are outside the current scope. |
+
+---
+
+## 5.5 Release Plan
+
+### Release 1 — Core Customer Experience
+
+**Primary focus:**
+
+- Customer Registration
+- Secure Login
+- Product Catalog
+- Product Search and Filtering
+- Product Details
+- Shopping Cart
+- Checkout
+- Order Creation
+
+---
+
+### Release 2 — Operations & Transactions
+
+**Primary focus:**
+
+- Order Tracking
+- Payment Management
+- Payment History
+- Product Management
+- Inventory Management
+- Category Management
+- Order Fulfillment
+
+---
+
+### Release 3 — Administration & Refinement
+
+**Primary focus:**
+
+- Customer Reviews
+- Address Book
+- User Management
+- Role Management
+- Review Moderation
+- CSV Reports
+- Audit Logs
+- Arabic / RTL support and responsive UI refinement
+
+---
+
+## 5.6 Out-of-Scope Backlog Items
+
+The following features are intentionally excluded from the current Ruqi Store implementation and must not be treated as implemented user stories:
+
+- Wishlist / Curated Collection
+- Showroom or appointment booking
+- Multi-vendor marketplace functionality
+- Native mobile application
+- Stripe or PayPal integration
+- Redis caching
+- External transactional email service
+- Delivery carrier API integration
+- AR/VR furniture visualization
+
+These items may be considered as future enhancements but are not part of the current system scope.
+
+---
+
+[← Previous: Use Case Model](./04-use-case-model.md) | [Back to Index](./00-index.md) | [Next: Domain Model →](./06-domain-model.md) |
