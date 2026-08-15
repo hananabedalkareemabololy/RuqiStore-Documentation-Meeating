@@ -197,7 +197,7 @@ graph LR
 The production deployment consists of a web application server running the monolithic ASP.NET Core MVC application and a SQL Server database.
 
 During development, SQLite is used as the local database.
-```
+```mermaid
 graph TB
 
     subgraph Clients["Client Devices"]
