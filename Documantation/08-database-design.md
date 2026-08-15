@@ -340,3 +340,167 @@ Payment logs are **append-only** and cannot be edited or deleted through normal 
 
 ```text
 UNIQUE(user_id, product_id)
+```
+
+# Technical & Data Integrity Rules
+
+Role-based authorization is enforced using ASP.NET Core MVC authorization mechanisms such as:
+
+```csharp
+[Authorize(Roles = "Administrator")]
+```
+
+---
+
+## Dynamic Shopping Carts & Uniqueness
+
+Each customer is allowed **exactly one persistent shopping cart**.
+
+This rule is enforced through a unique constraint on:
+
+```text
+carts.user_id
+```
+
+Products placed in the cart are represented through `cart_items`.
+
+The composite constraint:
+
+```sql
+UNIQUE(cart_id, product_id)
+```
+
+ensures that the same product cannot appear as multiple separate rows within one customer's cart.
+
+---
+
+## The Price Snapshot Pattern
+
+To preserve historical accuracy, the `order_items` table stores:
+
+```text
+unit_price
+product_name_snapshot
+```
+
+During checkout, the system copies the current product price and name into the order item.
+
+Future catalog changes therefore do not modify historical orders.
+
+---
+
+## Atomic Checkout & Inventory Protection
+
+Checkout operations are executed within an **atomic Entity Framework Core database transaction**.
+
+The transaction covers:
+
+1. Stock validation.
+2. Inventory deduction.
+3. Order creation.
+4. Order item creation.
+5. Price and product-name snapshot creation.
+6. Shopping cart cleanup.
+
+If any operation fails, the transaction is rolled back to prevent inconsistent inventory or incomplete orders.
+
+The system must also prevent:
+
+```text
+stock_quantity < 0
+```
+
+---
+
+## Cascade and Deletion Rules
+
+### Order Isolation
+
+Deleting an order removes its dependent order items according to the configured relationship.
+
+```text
+orders
+   |
+   └── order_items
+```
+
+This prevents orphaned order-item records.
+
+### Catalog Safeguard
+
+Products referenced by historical orders must not be physically deleted.
+
+Instead, the system uses **soft deletion**:
+
+```text
+products.is_active = FALSE
+```
+
+Inactive products are excluded from normal customer catalog results while historical order records remain intact.
+
+### Cart Cleanup
+
+Cart items are dependent on their parent cart.
+
+```text
+carts
+   |
+   └── cart_items
+```
+
+Deleting a cart therefore removes its associated cart items through cascading behavior.
+
+---
+
+## Customer Data Isolation
+
+Customer-owned records must be protected so that a customer can access only their own:
+
+* Shopping cart
+* Cart items
+* Saved addresses
+* Orders
+* Payment-related customer information
+* Product reviews
+
+Authorization and ownership checks are enforced at the application/service layer.
+
+---
+
+## Payment Data Integrity
+
+Payment status is managed exclusively by the **Payment Officer**.
+
+Store Managers can manage order fulfillment operations but cannot modify payment status.
+
+Payment actions are recorded in the append-only `payment_logs` table for accountability.
+
+---
+
+## Audit Logging
+
+Administrative and other configured system actions are recorded in `audit_logs`.
+
+Each audit entry contains:
+
+* Responsible user
+* Action
+* Affected entity
+* Affected record identifier
+* Timestamp
+
+Audit records are append-only and are not editable through normal application functionality.
+
+---
+
+## Development and Production Database Strategy
+
+During development, **SQLite** is used as the development database to simplify local setup and team sharing.
+
+The production environment is planned to use **SQL Server**.
+
+Entity Framework Core migrations are used to maintain the database schema consistently across environments.
+
+---
+
+[← Previous: UML Behavioral Models](./07-uml-behavioral.md) | [Back to Index](./00-index.md) | [Next: Architectural Design →](./09-architecture.md)
