@@ -379,6 +379,7 @@ block-beta
     G3[" "]
     G4[" "]
     G5["US-019 Reports & Audit Logs"]
+```
 ---
 
 ## 5.4 Priority Summary
