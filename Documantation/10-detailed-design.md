@@ -508,7 +508,35 @@ Before any checkout transaction is committed, the following validation rules and
 ---
 
 ## Checkout Workflow
+```mermaid
+flowchart TD
 
+    A[Checkout Request] --> B[Verify Customer Authorization]
+    B --> C[Retrieve Active Cart]
+    C --> D{Cart Empty?}
+
+    D -->|Yes| E[Return Validation Error]
+    D -->|No| F[Verify Stock]
+
+    F --> G{Stock Available?}
+
+    G -->|No| H[Return Out-of-Stock Error]
+    G -->|Yes| I[Read Current Product Prices]
+
+    I --> J[Create Price and Name Snapshots]
+    J --> K[Create Order]
+    K --> L[Create Order Items]
+    L --> M[Deduct Inventory]
+    M --> N[Create Payment Record]
+    N --> O[Clear Shopping Cart]
+    O --> P[Commit Transaction]
+    P --> Q[Return Order Confirmation]
+
+    style A fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px
+    style P fill:#e8f5e9,stroke:#43a047,stroke-width:2px
+    style Q fill:#e8f5e9,stroke:#43a047,stroke-width:2px
+
+```
 The checkout workflow follows the validation, snapshot, transaction, payment, and cart-cleanup operations described below.
 
 ### Stock Verification
