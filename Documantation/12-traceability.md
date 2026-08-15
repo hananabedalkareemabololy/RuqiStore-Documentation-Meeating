@@ -57,5 +57,5 @@ graph TD
     Admin --> Reviews[Review Moderation]
     Admin --> Reports[Reports]
     Admin --> AuditLogs[Audit Logs]
----
+```
 [← Previous: UI/UX Design](./11-ui-ux-design.md) | [Back to Index](./00-index.md) | [Next: Appendices →](./13-appendices.md)
