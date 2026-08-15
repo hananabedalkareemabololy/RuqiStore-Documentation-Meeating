@@ -1,18 +1,22 @@
-# 11. UI/UX Design & Frontend Specifications
+# 11 — UI/UX Design & Frontend Specifications
+
+## Ruqi Store — ASP.NET Core MVC
+
+---
 
 ## 11.1 Design Principles
 
 The Ruqi Store interface follows core usability heuristics and responsive e-commerce design principles to provide a clear, accessible, and consistent furniture shopping experience.
 
-| Principle                       | Application in Ruqi Store                                                                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Consistency**                 | Standardized navigation, page layouts, product cards, forms, buttons, status badges, and spacing across all views.                                                                   |
-| **Visibility of System Status** | Cart item counts, active navigation indicators, product stock status, order fulfillment status, and payment status are clearly displayed to users.                                   |
-| **Feedback**                    | User actions provide clear success and error feedback through toast notifications, inline validation messages, loading states, and updated order or cart information.                |
-| **Error Prevention & Recovery** | Forms use inline validation, stock quantities are validated before cart updates and checkout, invalid order status transitions are blocked, and payment rejection requires a reason. |
-| **Accessibility (WCAG 2.1 AA)** | The interface maintains sufficient color contrast, visible keyboard focus states, semantic HTML elements, descriptive labels, and accessible interactive controls.                   |
-| **Responsive Design**           | Layouts adapt to mobile, tablet, and desktop screen sizes while maintaining usability across all major customer and management pages.                                                |
-| **RTL / LTR Support**           | The interface supports both Arabic RTL and English LTR layouts using logical CSS properties and culture-based language switching.                                                    |
+| Principle                       | Application in Ruqi Store                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Consistency**                 | Standardized navigation, page layouts, product cards, forms, buttons, status badges, and spacing across customer and management pages.                  |
+| **Visibility of System Status** | Cart quantities, product stock status, fulfillment status, and payment status are clearly displayed.                                                    |
+| **Feedback**                    | User actions provide clear success and error feedback through inline validation, loading states, and updated cart or order information.                 |
+| **Error Prevention & Recovery** | Stock quantities are validated before cart updates and checkout, invalid order status transitions are blocked, and payment rejection requires a reason. |
+| **Accessibility (WCAG 2.1 AA)** | Interactive elements provide keyboard accessibility, visible focus states, descriptive labels, and sufficient color contrast.                           |
+| **Responsive Design**           | Layouts adapt to mobile, tablet, and desktop screen sizes.                                                                                              |
+| **RTL / LTR Support**           | The interface supports Arabic RTL and English LTR layouts using CSS logical properties and ASP.NET Core localization.                                   |
 
 ---
 
@@ -53,6 +57,7 @@ graph TD
     CustomerArea --> Profile
 
     Manager --> ManageProducts[Product Management]
+    Manager --> ManageCategories[Category Management]
     Manager --> ManageInventory[Inventory Management]
     Manager --> ManageOrders[Order Management]
     Manager --> ManagerReports[Store Reports]
@@ -71,114 +76,150 @@ graph TD
 
 ## 11.3 Page Layouts & Wireframes
 
-### A. Product Catalog Page (RTL View Example)
+### A. Product Catalog Page
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│ [Ruqi Logo]   [البحث عن أثاث...]      [العربية/EN] [🛒 السلة (2)] │
-│ الرئيسية | المنتجات | الحساب                         [تسجيل الدخول] │
+│ [Ruqi Logo]   [Search Furniture...]   [AR / EN] [Cart (2)] │
+│ Home | Products | Account                         [Login]   │
 ├─────────────────────────────────────────────────────────────┤
-│ الرئيسية > المنتجات                                         │
+│ Home > Products                                              │
 │                                                             │
-│ المنتجات                                                    │
+│ PRODUCTS                                                    │
 │                                                             │
 ├─────────────┬───────────────────────────────────────────────┤
-│ تصفية حسب   │ المنتجات                                      │
+│ FILTERS     │ PRODUCTS                                      │
 │             │                                               │
-│ التصنيف     │ ┌──────────────────────┐ ┌──────────────────┐ │
-│ [ الكل ]    │ │     [صورة المنتج]     │ │  [صورة المنتج]  │ │
-│ [ غرفة المعيشة ] │ │                  │ │                  │ │
-│ [ غرفة النوم ]   │ │ كرسي مريح        │ │ طاولة خشبية     │ │
-│ [ غرفة الطعام ]  │ │ 625.00 ₪         │ │ 1,250.00 ₪      │ │
-│             │ │ [🛒 أضف للسلة]       │ │ [🛒 أضف للسلة]  │ │
-│ السعر       │ │ داخل المخزون         │ │ داخل المخزون     │ │
-│ [من] [إلى] │ └──────────────────────┘ └──────────────────┘ │
+│ Category    │ ┌──────────────────────┐ ┌──────────────────┐ │
+│ [ All ]     │ │   [Product Image]    │ │ [Product Image]  │ │
+│ [Living]    │ │                      │ │                  │ │
+│ [Bedroom]   │ │ Comfortable Chair    │ │ Wooden Table     │ │
+│ [Dining]    │ │ 625.00 ₪             │ │ 1,250.00 ₪       │ │
+│             │ │ [Add to Cart]        │ │ [Add to Cart]    │ │
+│ Price       │ │ In Stock             │ │ In Stock          │ │
+│ [Min] [Max] │ └──────────────────────┘ └──────────────────┘ │
 │             │                                               │
-│ المادة      │ ┌──────────────────────┐ ┌──────────────────┐ │
-│ [ خشب ]     │ │     [صورة المنتج]     │ │  [صورة المنتج]  │ │
-│ [ معدن ]    │ │                      │ │                  │ │
-│             │ │ أريكة فاخرة          │ │ وحدة ديكور       │ │
-│ التوفر      │ │ 3,400.00 ₪          │ │ 450.00 ₪         │ │
-│ [✓ متوفر]   │ │ [🛒 أضف للسلة]       │ │ [🛒 أضف للسلة]  │ │
+│ Material    │ ┌──────────────────────┐ ┌──────────────────┐ │
+│ [Wood]      │ │   [Product Image]    │ │ [Product Image]  │ │
+│ [Metal]     │ │                      │ │                  │ │
+│             │ │ Luxury Sofa          │ │ Decor Unit       │ │
+│ Availability│ │ 3,400.00 ₪           │ │ 450.00 ₪         │ │
+│ [✓ In Stock]│ │ [Add to Cart]        │ │ In Stock          │ │
 │             │ └──────────────────────┘ └──────────────────┘ │
 ├─────────────┴───────────────────────────────────────────────┤
-│ © 2026 Ruqi Store. جميع الحقوق محفوظة.                      │
+│ © 2026 Ruqi Store. All Rights Reserved.                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-> **Note:** The catalog displays only active products belonging to active categories. Pagination is used to keep the product listing manageable.
+The catalog displays only active products belonging to active categories. Products are paginated with 20 products per page and sorted by newest first.
+
+Supported filters include:
+
+* Category
+* Price range
+* Material
+* Availability
+* Keyword search
 
 ---
 
-### B. Product Detail Page (RTL View Example)
+### B. Product Detail Page
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│ [Ruqi Logo]   [البحث عن أثاث...]      [العربية/EN] [🛒 السلة] │
-│ الرئيسية | المنتجات | الحساب                               │
+│ [Ruqi Logo]   [Search Furniture...]   [AR / EN] [Cart]      │
+│ Home | Products | Account                                    │
 ├─────────────────────────────────────────────────────────────┤
-│ الرئيسية > المنتجات > تفاصيل المنتج                         │
+│ Home > Products > Product Detail                             │
 │                                                             │
-│ ┌───────────────────────┐   كرسي مكتب مريح                  │
+│ ┌───────────────────────┐   Comfortable Office Chair        │
 │ │                       │   SKU: CHR-001                    │
-│ │    [صورة المنتج]      │                                   │
-│ │                       │   السعر: 625.00 ₪                 │
+│ │    [Product Image]    │                                   │
+│ │                       │   Price: 625.00 ₪                 │
 │ └───────────────────────┘                                   │
-│ [صورة] [صورة] [صورة]      الحالة: متوفر                    │
+│ [Image] [Image] [Image]      Status: In Stock              │
 │                                                             │
-│                              المادة: خشب                    │
-│                              الأبعاد: 60 × 55 × 90 cm       │
-│                              الوزن: 12 kg                    │
+│                              Material: Wood                  │
+│                              Dimensions: 60 × 55 × 90 cm    │
+│                              Weight: 12 kg                   │
 │                                                             │
-│                              الكمية: [ − ] [ 1 ] [ + ]     │
-│                              [ 🛒 أضف إلى السلة ]            │
+│                              Quantity: [ − ] [ 1 ] [ + ]    │
+│                              [ Add to Cart ]                 │
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
-│ التقييم: ★★★★☆ 4.2                                        │
+│ Rating: ★★★★☆ 4.2                                           │
 │                                                             │
-│ مراجعات العملاء                                             │
+│ Customer Reviews                                             │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ ★★★★★  منتج ممتاز                                       │ │
-│ │ مراجعة من عميل موثّق                                    │ │
+│ │ ★★★★★  Excellent Product                                │ │
+│ │ Verified Purchase                                        │ │
 │ └─────────────────────────────────────────────────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
-│ © 2026 Ruqi Store. جميع الحقوق محفوظة.                      │
+│ © 2026 Ruqi Store. All Rights Reserved.                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+The product detail page displays:
+
+* Product image gallery
+* Product name
+* SKU
+* Category
+* Price
+* Stock status
+* Material
+* Dimensions
+* Weight
+* Average rating
+* Visible verified-purchase reviews
+* Quantity selector
+* Add to Cart action
+
+The quantity selector cannot exceed the available `StockQuantity`.
+
 ---
 
-### C. Shopping Cart Page (RTL View Example)
+### C. Shopping Cart Page
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│ [Ruqi Logo]      [العربية/EN]                 [🛒 السلة]    │
+│ [Ruqi Logo]             [AR / EN]              [Cart]        │
 ├─────────────────────────────────────────────────────────────┤
-│ الرئيسية > السلة                                            │
+│ Home > Cart                                                  │
 │                                                             │
-│ سلة التسوق                                                   │
+│ SHOPPING CART                                                │
 │                                                             │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ [صورة] │ كرسي مريح │ 625 ₪ │ [ − ] 2 [ + ] │ 1,250 ₪ │ │
-│ │        │           │       │               │ [حذف]     │ │
+│ │ [Image] │ Product │ 625 ₪ │ [ − ] 2 [ + ] │ 1,250 ₪   │ │
+│ │         │         │       │               │ [Remove]    │ │
 │ └─────────────────────────────────────────────────────────┘ │
 │                                                             │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ الإجمالي الفرعي:                         1,250 ₪        │ │
-│ │ الضريبة:                                   50 ₪         │ │
-│ │ الشحن:                                     20 ₪         │ │
-│ │ الإجمالي:                               1,320 ₪         │ │
+│ │ Items Total:                             1,250 ₪        │ │
+│ │ Tax:                                        50 ₪        │ │
+│ │ Shipping:                                  20 ₪        │ │
+│ │ Total:                                   1,320 ₪        │ │
 │ └─────────────────────────────────────────────────────────┘ │
 │                                                             │
-│                         [ المتابعة إلى الدفع ]              │
+│                    [ Proceed to Checkout ]                  │
 ├─────────────────────────────────────────────────────────────┤
-│ © 2026 Ruqi Store. جميع الحقوق محفوظة.                      │
+│ © 2026 Ruqi Store. All Rights Reserved.                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+Cart interactions include:
+
+* View cart items
+* Increase/decrease quantity
+* Remove an item
+* Validate quantity against current stock
+* Display item subtotal
+* Display total including tax and shipping
+* Proceed to checkout
+
 ---
 
-### D. Checkout Page (LTR View Example)
+### D. Checkout Page
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -214,11 +255,53 @@ graph TD
 └─────────────────────────────────────────────────────────────┘
 ```
 
-> **Note:** Order placement is processed through an atomic EF Core transaction. If any validation or stock operation fails, the transaction is rolled back.
+Checkout consists of:
+
+1. Selecting or entering a delivery address.
+2. Selecting Cash on Delivery or Bank Transfer.
+3. Reviewing the order summary.
+4. Confirming the order.
+5. Displaying the order confirmation and `OrderId`.
+
+Order placement is processed through an atomic EF Core transaction. If validation or stock processing fails, the transaction is rolled back and the customer's cart is preserved.
 
 ---
 
-### E. Store Manager Dashboard
+### E. Customer Order History
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ Ruqi Store                                      Customer     │
+├─────────────────────────────────────────────────────────────┤
+│ Home > Orders                                               │
+│                                                             │
+│ MY ORDERS                                                   │
+│                                                             │
+│ ┌───────┬────────────┬────────────┬──────────┬────────────┐ │
+│ │ Order │ Date       │ Fulfillment│ Payment  │ Total      │ │
+│ ├───────┼────────────┼────────────┼──────────┼────────────┤ │
+│ │ #1024 │ 15 Aug     │ Processing │ Paid     │ 1,320 ₪    │ │
+│ │ #1023 │ 10 Aug     │ Delivered  │ Paid     │ 850 ₪      │ │
+│ └───────┴────────────┴────────────┴──────────┴────────────┘ │
+│                                                             │
+│                       [ View Details ]                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Order history displays:
+
+* Order ID
+* Date
+* Fulfillment status
+* Payment status
+* Total amount
+* View Details action
+
+The order detail page provides the fulfillment timeline, payment information, items, delivery address, and total breakdown.
+
+---
+
+### F. Store Manager Dashboard
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -228,12 +311,14 @@ graph TD
 │ Products      │                                             │
 │ Categories    │ ┌────────────┐ ┌────────────┐              │
 │ Inventory     │ │ Revenue    │ │ Products   │              │
-│ Orders        │ │ 25,400 ₪   │ │ 128 Active │              │
-│ Reports       │ └────────────┘ └────────────┘              │
+│ Orders        │ │ Daily /    │ │ Active     │              │
+│ Reports       │ │ Weekly     │ │ Products   │              │
+│               │ │ Monthly    │ │            │              │
+│               │ └────────────┘ └────────────┘              │
 │               │                                             │
 │               │ ┌────────────┐ ┌────────────┐              │
 │               │ │ Low Stock  │ │ Pending    │              │
-│               │ │ 8 Products │ │ 12 Orders  │              │
+│               │ │ Products   │ │ Orders     │              │
 │               │ └────────────┘ └────────────┘              │
 │               │                                             │
 │               │ Revenue Overview                            │
@@ -247,9 +332,53 @@ graph TD
 └─────────────────────────────────────────────────────────────┘
 ```
 
+The Store Manager dashboard provides:
+
+* Total revenue by period
+* Active product count
+* Low-stock alerts
+* Pending order count
+* Revenue overview
+* Top products
+* Inventory summary
+
+The manager can also access product management, categories, inventory, orders, and store reports.
+
 ---
 
-### F. Admin Dashboard
+### G. Payment Officer Dashboard
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ Ruqi Store                          Payment Officer | Logout │
+├───────────────┬─────────────────────────────────────────────┤
+│ Dashboard     │ PAYMENT DASHBOARD                           │
+│ Orders        │                                             │
+│ Payment Log   │ Unpaid Orders                               │
+│               │ ┌─────────────────────────────────────────┐ │
+│               │ │ Order | Customer | Method | Total | ... │ │
+│               │ ├─────────────────────────────────────────┤ │
+│               │ │ #1024 | Customer | Bank   | 1,320 ₪    │ │
+│               │ └─────────────────────────────────────────┘ │
+│               │                                             │
+│               │ [ Mark Paid ]   [ Reject Payment ]          │
+│               │                                             │
+│               │ Payment History                             │
+└───────────────┴─────────────────────────────────────────────┘
+```
+
+The Payment Officer manages payment status independently from fulfillment status.
+
+Available payment methods are:
+
+* Cash on Delivery
+* Bank Transfer
+
+Payment rejection requires a non-empty rejection reason, and every payment decision is recorded in the append-only `PaymentLogs` table.
+
+---
+
+### H. Admin Dashboard
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -259,12 +388,12 @@ graph TD
 │ Users         │                                             │
 │ Orders        │ ┌────────────┐ ┌────────────┐              │
 │ Reviews       │ │ Users      │ │ Orders     │              │
-│ Reports       │ │ 1,250      │ │ 540        │              │
+│ Reports       │ │ Total      │ │ Total      │              │
 │ Audit Logs    │ └────────────┘ └────────────┘              │
 │               │                                             │
 │               │ ┌────────────┐ ┌────────────┐              │
 │               │ │ Reviews    │ │ Revenue    │              │
-│               │ │ 15 Pending │ │ 85,400 ₪   │              │
+│               │ │ Pending    │ │ Total      │              │
 │               │ └────────────┘ └────────────┘              │
 │               │                                             │
 │               │ Recent Audit Events                         │
@@ -277,41 +406,50 @@ graph TD
 └─────────────────────────────────────────────────────────────┘
 ```
 
+The Admin panel provides:
+
+* User management
+* Role assignment and revocation
+* Platform-wide order oversight
+* Review moderation
+* CSV reports
+* Audit log access
+
+Administrative actions such as account activation/deactivation, role changes, and review moderation require confirmation and are recorded in the append-only `AuditLogs` table.
+
 ---
 
 ## 11.4 Accessibility Considerations
 
-To ensure an inclusive and responsive interface, the following accessibility requirements are applied throughout Ruqi Store:
-
-| Requirement                          | Implementation Details                                                                                                                                                                               |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Color Contrast**                   | Text, labels, buttons, status indicators, and form elements maintain a minimum contrast ratio of 4.5:1 against their backgrounds.                                                                    |
-| **Color Independence**               | Status information is never communicated through color alone. Fulfillment and payment statuses include readable text such as `Pending`, `Processing`, `Shipped`, `Delivered`, `Paid`, or `Rejected`. |
-| **Keyboard Navigation**              | All interactive elements are accessible through keyboard navigation using standard `Tab`, `Shift+Tab`, `Enter`, and `Spacebar` interactions.                                                         |
-| **RTL / LTR Bi-directional Support** | Arabic uses RTL layout while English uses LTR layout. CSS logical properties such as `margin-inline-start` and `padding-inline-end` are used so layouts mirror correctly.                            |
-| **Screen Readers (ARIA)**            | Interactive icons, image galleries, navigation controls, form inputs, and icon-only buttons use descriptive labels and appropriate ARIA attributes.                                                  |
-| **Form Accessibility**               | Validation messages are displayed near the relevant input fields and provide clear instructions for correcting invalid values.                                                                       |
-| **Responsive Accessibility**         | Pages remain usable from 320px mobile screens through large desktop displays without losing essential functionality.                                                                                 |
-| **Focus Visibility**                 | Keyboard focus indicators remain clearly visible on buttons, links, form controls, navigation items, and other interactive elements.                                                                 |
+| Requirement                  | Implementation Details                                                                                                            |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Color Contrast**           | Text, labels, buttons, status indicators, and form elements maintain sufficient contrast against their backgrounds.               |
+| **Color Independence**       | Fulfillment and payment states are displayed using readable status labels rather than relying on color alone.                     |
+| **Keyboard Navigation**      | Interactive elements are accessible using standard keyboard navigation.                                                           |
+| **RTL / LTR Support**        | Arabic uses RTL layout while English uses LTR layout. CSS logical properties are used to allow layouts to mirror correctly.       |
+| **Screen Readers (ARIA)**    | Image galleries, navigation controls, form inputs, and icon-only controls use descriptive labels and appropriate ARIA attributes. |
+| **Form Accessibility**       | Validation messages appear near the relevant input fields and explain how to correct invalid values.                              |
+| **Responsive Accessibility** | Pages remain usable across mobile, tablet, and desktop screen sizes.                                                              |
+| **Focus Visibility**         | Keyboard focus indicators remain visible on interactive elements.                                                                 |
 
 ---
 
 ## 11.5 Responsive Design
 
-| Breakpoint  | Width          | Layout                                                                                                                 |
-| ----------- | -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **Mobile**  | 320px – 767px  | Single-column layouts, collapsible navigation, stacked forms, and horizontally scrollable data tables where necessary. |
-| **Tablet**  | 768px – 1023px | Two-column product grids, adaptive dashboards, and optimized navigation.                                               |
-| **Desktop** | 1024px+        | Three- or four-column product grids, full navigation, sidebars for management dashboards, and wider data tables.       |
+| Breakpoint  | Width          | Layout                                                                                                            |
+| ----------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Mobile**  | 320px – 767px  | Single-column layouts, collapsible navigation, stacked forms, and horizontally scrollable tables where necessary. |
+| **Tablet**  | 768px – 1023px | Two-column product grids, adaptive dashboards, and optimized navigation.                                          |
+| **Desktop** | 1024px+        | Three- or four-column product grids, full navigation, management sidebars, and wider data tables.                 |
 
 ### Responsive Behavior
 
-* Product cards automatically adapt to the available screen width.
+* Product cards adapt to the available screen width.
 * Checkout sections stack vertically on smaller screens.
 * Management tables support horizontal scrolling on mobile devices.
 * Navigation collapses into a mobile-friendly menu on smaller screens.
-* Forms use responsive widths while maintaining readable labels and input controls.
-* Dashboard cards rearrange automatically according to available screen space.
+* Forms use responsive widths while maintaining readable labels and controls.
+* Dashboard cards rearrange according to the available screen space.
 
 ---
 
@@ -332,9 +470,9 @@ Ruqi Store supports both **English** and **Arabic** interfaces.
 
 In RTL Arabic mode:
 
-* Currency symbol appears according to the configured Arabic price format.
 * Text flows from right to left.
-* Price values remain left-to-right where necessary using `dir="ltr"` on numeric price elements.
+* Currency formatting follows the configured Arabic price format.
+* Numeric price values remain left-to-right where necessary using `dir="ltr"`.
 
 Example:
 
@@ -346,40 +484,40 @@ Example:
 
 ## 11.7 UI Component Standards
 
-The following design system rules ensure visual consistency throughout Ruqi Store:
-
-| Component               | Specification                                                                                                           |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **Primary Button**      | Deep navy blue (`#1A2B4C`), white text, minimum height of 48px, clear hover and focus states.                           |
-| **Secondary Button**    | Transparent or neutral background with a solid 1px border, dark text, and a visible focus state.                        |
-| **Form Inputs**         | Light background, clear 1px border, readable placeholder text, associated labels, and visible focus indication.         |
-| **Product Cards**       | Clean white background, structured product information, product image, price, stock status, and primary cart action.    |
-| **Status Badges**       | Clear text labels for fulfillment and payment states, with color used only as a supporting visual indicator.            |
-| **Toast Notifications** | Displayed in a consistent top-end position and automatically dismissed after a short period while remaining accessible. |
-| **Loading States**      | Buttons display a loading state after submission to prevent duplicate actions.                                          |
-| **Validation Messages** | Displayed inline next to the relevant form field using clear, user-friendly language.                                   |
-| **Image Gallery**       | Main product image with thumbnail navigation and accessible labels for product images.                                  |
-| **Data Tables**         | Consistent column headers, pagination, filtering controls, and horizontal scrolling on smaller screens.                 |
+| Component               | Specification                                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Primary Button**      | Clear primary action with visible hover and focus states and a minimum comfortable touch height.      |
+| **Secondary Button**    | Neutral or transparent background with a visible border and focus state.                              |
+| **Form Inputs**         | Clear labels, readable placeholders, validation feedback, and visible focus indication.               |
+| **Product Cards**       | Product image, name, price, stock status, and primary cart action.                                    |
+| **Status Badges**       | Readable fulfillment and payment status labels with color used only as a supporting visual indicator. |
+| **Toast Notifications** | Consistent success and failure notifications that are automatically dismissed after a short period.   |
+| **Loading States**      | Buttons display a loading/disabled state after submission to prevent duplicate actions.               |
+| **Validation Messages** | Displayed inline next to the relevant field using clear user-friendly language.                       |
+| **Image Gallery**       | Main product image with thumbnail navigation and accessible labels.                                   |
+| **Data Tables**         | Consistent headers, pagination, filtering, and horizontal scrolling on smaller screens.               |
 
 ---
 
 ## 11.8 Frontend Technology & Implementation
 
-| Technology                    | Usage                                                                                                        |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Razor Views (`.cshtml`)**   | Server-rendered user interface for customer and management pages.                                            |
-| **HTML5**                     | Semantic page structure and accessible form elements.                                                        |
-| **CSS3**                      | Responsive layouts, RTL/LTR support, component styling, and visual consistency.                              |
-| **Vanilla JavaScript**        | Client-side interactions, UI feedback, quantity controls, image gallery interactions, and form enhancements. |
-| **ASP.NET Core MVC**          | Controller-driven page navigation and server-side request handling.                                          |
-| **Razor Validation**          | Display of model validation and business-rule validation messages within forms.                              |
-| **ASP.NET Core Localization** | English and Arabic culture support through the application culture configuration.                            |
+| Technology                    | Usage                                                                                                       |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Razor Views (`.cshtml`)**   | Server-rendered user interface for customer and management pages.                                           |
+| **HTML5**                     | Semantic page structure and accessible form elements.                                                       |
+| **CSS3**                      | Responsive layouts, RTL/LTR support, component styling, and visual consistency.                             |
+| **Vanilla JavaScript**        | Client-side interactions, quantity controls, image gallery behavior, loading states, and form enhancements. |
+| **ASP.NET Core MVC**          | Controller-driven page navigation and server-side request handling.                                         |
+| **Razor Validation**          | Display of model and validation errors within forms.                                                        |
+| **ASP.NET Core Localization** | English and Arabic culture support through application culture configuration.                               |
+
+The frontend is server-rendered through Razor Views and does not use a separate React or SPA frontend.
 
 ---
 
 ## 11.9 Page Inventory
 
-The final Ruqi Store interface contains the following main pages:
+The following pages represent the main customer and management interfaces defined for Ruqi Store.
 
 ### Public Pages
 
@@ -413,19 +551,25 @@ The final Ruqi Store interface contains the following main pages:
 
 ### Store Manager Pages
 
-| Page                   | Route                |
-| ---------------------- | -------------------- |
-| **Manager Dashboard**  | `/Manager/Dashboard` |
-| **Product Management** | `/Manager/Products`  |
-| **Order Management**   | `/Manager/Orders`    |
+| Page                     | Route                 |
+| ------------------------ | --------------------- |
+| **Manager Dashboard**    | `/Manager/Dashboard`  |
+| **Product Management**   | `/Manager/Products`   |
+| **Category Management**  | `/Manager/Categories` |
+| **Inventory Management** | `/Manager/Inventory`  |
+| **Order Management**     | `/Manager/Orders`     |
+| **Store Reports**        | `/Manager/Reports`    |
 
 ### Admin Pages
 
-| Page                | Route             |
-| ------------------- | ----------------- |
-| **Admin Dashboard** | `/Admin`          |
-| **User Management** | `/Admin/Users`    |
-| **Audit Log**       | `/Admin/AuditLog` |
+| Page                  | Route             |
+| --------------------- | ----------------- |
+| **Admin Dashboard**   | `/Admin`          |
+| **User Management**   | `/Admin/Users`    |
+| **Order Oversight**   | `/Admin/Orders`   |
+| **Review Moderation** | `/Admin/Reviews`  |
+| **Reports**           | `/Admin/Reports`  |
+| **Audit Log**         | `/Admin/AuditLog` |
 
 ---
 
@@ -436,13 +580,46 @@ The final Ruqi Store interface contains the following main pages:
 | **Form Validation**      | Validation errors appear inline beside the relevant field instead of exposing raw exceptions.                                           |
 | **Submit Buttons**       | Buttons enter a loading/disabled state after the first submission to prevent duplicate requests.                                        |
 | **Toast Notifications**  | Successful and failed operations provide short user-facing notifications.                                                               |
-| **Cart Quantity**        | Quantity controls provide immediate validation against the available `StockQuantity`.                                                   |
+| **Cart Quantity**        | Quantity controls provide immediate validation against available `StockQuantity`.                                                       |
 | **Order Status**         | Fulfillment and payment statuses are displayed using readable status badges and clear labels.                                           |
 | **Image Interaction**    | Product galleries allow users to select thumbnails and view the selected product image.                                                 |
 | **Pagination**           | Product and management lists use pagination to keep large datasets manageable.                                                          |
-| **Filtering**            | Catalog and management pages provide appropriate filters for categories, price, availability, status, and other supported criteria.     |
-| **Confirmation Dialogs** | Destructive or important administrative actions such as user deactivation and review moderation require confirmation before submission. |
+| **Filtering**            | Catalog and management pages provide filters for categories, price, availability, status, and supported search criteria.                |
+| **Confirmation Dialogs** | Important administrative actions such as user deactivation, role changes, and review moderation require confirmation before submission. |
+| **Data Isolation**       | Customer-facing pages display and operate only on the authenticated customer's own cart, orders, addresses, and reviews.                |
 
 ---
 
-[← Previous: Detailed Class Design](./10-detailed-design.md) | [Back to Index](./00-index.md) | [Next: Traceability Matrix](./12-traceability.md)]
+## 11.11 Security-Aware Frontend Requirements
+
+The frontend works together with ASP.NET Core Identity and the Service Layer to protect application functionality.
+
+| Requirement            | Implementation                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Authentication**     | Protected pages require an authenticated Identity user.                                                            |
+| **Role Authorization** | Management pages use role-based authorization for `Customer`, `StoreManager`, `PaymentOfficer`, and `Admin`.       |
+| **CSRF Protection**    | Protected POST forms use ASP.NET Core anti-forgery protection.                                                     |
+| **Data Isolation**     | Customer data is validated against the authenticated user's ID in the Service Layer.                               |
+| **Password Handling**  | Passwords are submitted to ASP.NET Core Identity and are never displayed or stored by the frontend.                |
+| **Secure Cookies**     | Authentication uses secure, HttpOnly cookies managed by ASP.NET Core Identity.                                     |
+| **Validation**         | Client-side feedback improves usability while authoritative business-rule validation remains in the Service Layer. |
+
+---
+
+## 11.12 Future UI Features
+
+The following feature is planned but is **not available in the current version**:
+
+### Wishlist
+
+The Wishlist feature is planned as a future enhancement. When implemented, customers will be able to:
+
+* Save favorite furniture products.
+* View saved products.
+* Move saved products to the shopping cart.
+
+No current UI page or route is required for Wishlist in the current version of Ruqi Store.
+
+---
+
+[← Previous: Detailed Class Design](10-detailed-design.md) | [Back to Index](00-index.md) | [Next: Traceability Matrix](12-traceability.md)
