@@ -621,4 +621,4 @@ Showroom appointments and the Accountant role are not part of the current Ruqi S
 
 ---
 
-[← Previous: Requirements Specification](./03-requirements.md) | [Back to Index](./00-index.md) | [Next: Customer Features →](./05-customer-features.md)
+[← Previous: Requirements Specification](./03-requirements.md) | [Back to Index](./00-index.md) | [Next: user-stories →](./05-user-stories.md)
