@@ -82,7 +82,6 @@ graph TB
 
 This diagram illustrates the main components of the Ruqi Store monolithic ASP.NET Core MVC application and how requests flow from the browser through controllers, services, repositories, and Entity Framework Core to the database.
 
-
 ```mermaid
 graph LR
 
@@ -94,6 +93,9 @@ graph LR
         CheckoutUI["Checkout"]
         OrdersUI["Orders / Tracking"]
         ReviewUI["Product Reviews"]
+        AddressUI["Address Management"]
+        ManagerUI["Manager / Product Management"]
+        PaymentUI["Payment Dashboard"]
         AdminUI["Admin / Management Views"]
     end
 
@@ -143,6 +145,9 @@ graph LR
     CheckoutUI --> OrderC
     OrdersUI --> OrderC
     ReviewUI --> ReviewC
+    AddressUI --> AddressC
+    ManagerUI --> ManagerC
+    PaymentUI --> PaymentC
     AdminUI --> AdminC
 
     Controllers --> Services
@@ -172,7 +177,6 @@ graph LR
     style Controllers fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     style Services fill:#e8f5e9,stroke:#43a047,stroke-width:2px
     style Data fill:#f5f5f5,stroke:#9e9e9e,stroke-width:2px
-
 ```
 ## 9.4 Architectural Decisions
 
