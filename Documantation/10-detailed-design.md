@@ -262,10 +262,11 @@ public interface IPaymentService
         string paymentOfficerId
     );
 
-    Task<bool> RejectPaymentAsync(
-        int orderId,
-        string paymentOfficerId
-    );
+  Task<bool> RejectPaymentAsync(
+    int orderId,
+    string paymentOfficerId,
+    string reason
+);
 
     Task<IEnumerable<PaymentLogDto>> GetPaymentLogsAsync(
         int orderId
@@ -357,8 +358,9 @@ public interface IAuditLogService
     Task LogAsync(
         string userId,
         string action,
-        string entityName,
-        int? entityId
+        string targetEntityType,
+        string targetEntityId,
+        string description
     );
 
     Task<IEnumerable<AuditLogDto>> GetLogsAsync();
@@ -721,9 +723,12 @@ public class PaymentController : Controller
     [ValidateAntiForgeryToken]
     public Task<IActionResult> Approve(int orderId);
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public Task<IActionResult> Reject(int orderId);
+   [HttpPost]
+[ValidateAntiForgeryToken]
+public Task<IActionResult> Reject(
+    int orderId,
+    string reason
+);
 }
 ```
 
