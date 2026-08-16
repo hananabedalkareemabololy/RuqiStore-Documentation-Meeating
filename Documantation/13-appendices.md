@@ -242,6 +242,7 @@ Repository / EF Core
   │
   ▼
 Database
+---
 Authentication and authorization are provided through:
 
 ASP.NET Core Identity
