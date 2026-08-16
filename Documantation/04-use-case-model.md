@@ -154,7 +154,7 @@ Each protected use case is restricted to the appropriate system role.
 | ID | Use Case | Primary Actor |
 | --- | --- | --- |
 | **UC-001** | Customer Registration | Guest |
-| **UC-002** | Customer Login | Guest / Customer |
+| **UC-002** | Customer Login | Guest |
 | **UC-003** | Browse & Filter Product Catalog | Customer / Guest |
 | **UC-004** | View Product Details | Customer / Guest |
 | **UC-005** | Manage Shopping Cart | Customer |
