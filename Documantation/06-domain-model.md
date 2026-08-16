@@ -6,13 +6,18 @@ Domain classes are identified by examining the system's use cases, functional re
 
 | Source | Nouns Extracted | Candidate Class |
 | :--- | :--- | :--- |
-| **UC-05: Add to Cart & Checkout** | customer, cart, cart item, product, order, order item, address | Customer, Cart, CartItem, Product, Order, OrderItem, Address |
-| **UC-06: Track Order Status** | customer, order, fulfillment status, payment status, order item | Customer, Order, OrderItem |
-| **UC-07: Submit Product Review** | customer, product, review, rating, comment, purchase | Customer, Product, ProductReview |
-| **UC-08: Store Manager Creates Product** | product, category, SKU, stock, image | Product, Category, ProductImage |
-| **UC-09: Update Fulfillment Status** | order, fulfillment status, manager | Order, StoreManager |
-| **UC-10/11: Payment Management** | payment, payment status, payment log, rejection reason | Payment, PaymentLog |
-| **UC-12: Admin Manages Users** | user, role, account status, audit log | ApplicationUser, Role, AuditLog |
+| **UC-005: Manage Shopping Cart** | customer, cart, cart item, product | Customer, Cart, CartItem, Product |
+| **UC-006: Checkout & Place Order** | customer, cart, order, order item, product, address, payment | Customer, Cart, Order, OrderItem, Product, Address, Payment |
+| **UC-007: Track Order** | customer, order, fulfillment status, payment status, order item | Customer, Order, OrderItem |
+| **UC-008: Submit Verified Product Review** | customer, product, review, rating, comment, purchase | Customer, Product, ProductReview |
+| **UC-010: Manage Products & Categories** | product, category, SKU, image | Product, Category, ProductImage |
+| **UC-011: Manage Inventory** | product, stock, category | Product, Category |
+| **UC-012: Update Order Fulfillment Status** | order, fulfillment status, manager | Order, StoreManager |
+| **UC-013: Manage Payment Status** | payment, payment status, payment log, rejection reason | Payment, PaymentLog |
+| **UC-014: Manage Users & Roles** | user, role, account status, administrator | ApplicationUser, Role, Administrator |
+| **UC-015: Moderate Product Reviews** | review, administrator, audit log | ProductReview, Administrator, AuditLog |
+| **UC-017: View Audit Logs** | audit log, administrator | AuditLog, Administrator |
+| **UC-018: View Payment History** | payment, payment log, administrator, payment officer | Payment, PaymentLog, Administrator, PaymentOfficer |
 
 After removing transient request objects, UI-specific elements, and out-of-scope features, the final structural domain classes are defined below.
 
@@ -179,13 +184,13 @@ classDiagram
         -DateTime Timestamp
     }
 
-    class Role {
-        <<enumeration>>
-        Customer
-        StoreManager
-        PaymentOfficer
-        Admin
-    }
+class Role {
+    <<enumeration>>
+    Customer
+    StoreManager
+    PaymentOfficer
+    Administrator
+}
 
     %% User roles
     ApplicationUser --> Role : has role
@@ -253,7 +258,7 @@ classDiagram
         Customer
         StoreManager
         PaymentOfficer
-        Admin
+        Administrator
     }
 
     class FulfillmentStatus {
@@ -265,12 +270,12 @@ classDiagram
         Cancelled
     }
 
-    class PaymentStatus {
-        <<enumeration>>
-        Pending
-        Paid
-        Rejected
-    }
+ class PaymentStatus {
+    <<enumeration>>
+    Unpaid
+    Paid
+    Rejected
+}
 
     class ReviewVisibility {
         <<enumeration>>
@@ -284,7 +289,7 @@ classDiagram
 | :--- | :--- | :--- |
 | **Role** | Customer, StoreManager, PaymentOfficer, Admin | Defines role-based permissions within the system. |
 | **FulfillmentStatus** | Pending, Processing, Shipped, Delivered, Cancelled | Represents the lifecycle of an order from placement to fulfillment. |
-| **PaymentStatus** | Pending, Paid, Rejected | Represents the current payment state of an order. |
+| **PaymentStatus** | Unpaid, Paid, Rejected | Represents the current payment state of an order. |
 | **ReviewVisibility** | Visible, Hidden | Controls whether a customer review is displayed publicly after moderation. |
 
 ---
