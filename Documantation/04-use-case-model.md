@@ -102,6 +102,8 @@ graph TB
     UC7 -.->|requires authentication| UC2
     UC8 -.->|requires authentication| UC2
     UC9 -.->|requires authentication| UC2
+
+```
 ---
 
 # 4.3 Use Case Relationships
