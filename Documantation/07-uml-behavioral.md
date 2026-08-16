@@ -161,7 +161,7 @@ sequenceDiagram
     P->>UI: Open Payment Dashboard
     UI->>PC: GET /Payment/Dashboard
 
-    GetUnpaidPaymentsAsync()
+   PC->>PS: GetUnpaidPaymentsAsync()
     PS->>DB: Load orders and payment records
     DB-->>PS: Unpaid payment records
     PS-->>PC: Payment records
