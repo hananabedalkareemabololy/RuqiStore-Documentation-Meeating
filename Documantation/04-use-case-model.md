@@ -253,3 +253,386 @@ Each protected use case is restricted to the appropriate system role.
   * `BankTransfer`
 
 ---
+# 4.6 Fully Dressed Use Case — UC-012: Update Order Fulfillment Status
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-012 |
+| **Name** | Update Order Fulfillment Status |
+| **Primary Actor** | Store Manager |
+| **Controller** | `StoreManagerController` |
+| **Service** | `OrderService` |
+| **Description** | Store Manager updates the fulfillment progress of a customer order. |
+| **Preconditions** | Store Manager is authenticated and authorized; target order exists. |
+| **Postconditions** | Valid fulfillment status transition is saved with an updated timestamp. |
+| **Trigger** | Store Manager selects a new fulfillment status for an order. |
+
+---
+
+## Main Success Scenario
+
+| Step | Action |
+| --- | --- |
+| 1 | Store Manager opens `/Manager/Orders`. |
+| 2 | System displays available orders. |
+| 3 | Manager selects an order. |
+| 4 | Manager selects a new fulfillment status. |
+| 5 | `OrderService` validates the status transition. |
+| 6 | System updates `FulfillmentStatus`. |
+| 7 | System updates `UpdatedAt`. |
+| 8 | System saves the changes through EF Core. |
+| 9 | Customer sees the updated status on the next order-tracking request. |
+
+---
+## Valid Status Transitions
+
+Pending
+↓
+Processing
+↓
+Shipped
+↓
+Delivered
+
+Cancellation is allowed from any status except `Delivered`:
+
+Pending
+Processing
+Shipped
+↓
+Cancelled
+
+---
+
+## Exception Flows
+
+| ID | Condition | Result |
+| --- | --- | --- |
+| **E1** | Invalid transition | System rejects the request with `InvalidStatusTransitionException`. |
+| **E2** | Order not found | System returns a not-found result. |
+| **E3** | Unauthorized user | Access is denied by ASP.NET Core authorization. |
+
+> **Important:** Store Manager can update `FulfillmentStatus` only. `PaymentStatus` is managed exclusively by the Payment Officer.
+
+---
+# 4.7 Fully Dressed Use Case — UC-013: Manage Payment Status
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-013 |
+| **Name** | Manage Payment Status |
+| **Primary Actor** | Payment Officer |
+| **Controller** | `PaymentController` |
+| **Service** | `PaymentService` |
+| **Description** | Payment Officer reviews payment information and marks an order as Paid or Rejected. |
+| **Preconditions** | Payment Officer is authenticated and authorized; target order exists. |
+| **Postconditions** | Payment status is updated and an immutable `PaymentLog` record is created. |
+| **Trigger** | Payment Officer selects an unpaid order for payment processing. |
+
+---
+
+## Main Success Scenario — Mark Paid
+
+| Step | Action |
+| --- | --- |
+| 1 | Payment Officer opens the payment dashboard. |
+| 2 | System displays orders requiring payment review. |
+| 3 | Payment Officer selects an order. |
+| 4 | Payment Officer selects **Mark Paid**. |
+| 5 | `PaymentService` validates the current payment status. |
+| 6 | System changes `PaymentStatus` from `Unpaid` to `Paid`. |
+| 7 | System creates a `PaymentLog` containing the previous and new status. |
+| 8 | System saves the changes. |
+| 9 | Payment history reflects the new payment decision. |
+
+---
+
+## Alternative Flow — Reject Payment
+
+| Step | Action |
+| --- | --- |
+| 1 | Payment Officer selects **Reject**. |
+| 2 | System displays a rejection-reason field. |
+| 3 | Payment Officer enters the reason. |
+| 4 | `PaymentService` validates that the reason is not empty. |
+| 5 | System changes `PaymentStatus` to `Rejected`. |
+| 6 | System stores the rejection reason. |
+| 7 | System creates an immutable `PaymentLog`. |
+
+---
+
+## Business Rules
+
+* Only `PaymentOfficer` can change payment status.
+* `PaymentStatus` values are:
+  * `Unpaid`
+  * `Paid`
+  * `Rejected`
+* A rejection requires a non-empty rejection reason.
+* Every payment decision creates a `PaymentLog`.
+* `PaymentLog` is append-only.
+* Payment logs cannot be updated or deleted.
+
+---
+
+# 4.8 Fully Dressed Use Case — UC-008: Submit Verified Product Review
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-008 |
+| **Name** | Submit Verified Product Review |
+| **Primary Actor** | Customer |
+| **Controller** | `ProductsController` |
+| **Service** | `ReviewService` |
+| **Description** | A customer submits a review for a product they previously purchased and received. |
+| **Preconditions** | Customer is authenticated; customer has a Delivered order containing the product; customer has not already reviewed the product. |
+| **Postconditions** | Review is stored with `IsVerifiedPurchase = true` and becomes visible according to the system moderation state. |
+| **Trigger** | Customer selects the review option for an eligible purchased product. |
+
+---
+
+## Main Flow
+
+| Step | Action |
+| --- | --- |
+| 1 | Customer opens the product details page. |
+| 2 | System checks whether the customer has a Delivered order containing the product. |
+| 3 | System checks whether the customer has already reviewed the product. |
+| 4 | Customer enters a rating from 1 to 5 stars. |
+| 5 | Customer optionally enters a title and comment. |
+| 6 | Customer submits the review. |
+| 7 | `ReviewService` validates the review rules. |
+| 8 | System saves the review with `IsVerifiedPurchase = true`. |
+| 9 | System recalculates the product's average rating. |
+
+---
+
+## Exception Flows
+
+| ID | Condition | Result |
+| --- | --- | --- |
+| **E1** | No Delivered purchase | System rejects the review with `NoPurchaseFoundException`. |
+| **E2** | Customer already reviewed product | System rejects the review with `DuplicateReviewException`. |
+| **E3** | Invalid rating | System rejects the submitted rating. |
+
+---
+## Business Rules
+
+* Only authenticated customers can submit reviews.
+* A review requires a Delivered order containing the reviewed product.
+* Each customer can submit only one review per product.
+* Rating must be between 1 and 5.
+* Verified purchases are marked using `IsVerifiedPurchase = true`.
+* Review visibility is controlled through `IsVisible`.
+* Administrators can moderate reviews.
+
+---
+
+# 4.9 Customer Data Isolation
+
+Customer-specific use cases must enforce data isolation through the Service Layer.
+
+A customer may access only their own:
+
+* Cart
+* Cart items
+* Orders
+* Order items
+* Addresses
+* Reviews
+
+The Service Layer validates:
+
+entity.UserId == currentUserId
+
+If the requested resource belongs to another customer, the system denies access.
+
+This rule applies to:
+
+* Order details
+* Order history
+* Cart operations
+* Address management
+* Customer-specific review operations
+
+---
+# 4.10 Administrator Use Cases
+
+The Administrator has system-wide oversight and management capabilities.
+
+### User Management
+
+The Administrator can:
+
+* View users
+* Search users
+* Activate users
+* Deactivate users
+* Assign roles
+* Revoke roles
+
+The Administrator cannot modify their own permissions or deactivate their own account.
+
+---
+### Review Moderation
+
+The Administrator can:
+
+* View reviews
+* Filter reviews
+* Hide reviews by setting `IsVisible = false`
+
+Every review moderation action creates an `AuditLog`.
+
+---
+
+### Payment History
+
+The Administrator can:
+
+* View payment records
+* Filter payment records
+* Review payment status history
+
+The Administrator cannot change payment status unless the system explicitly grants this permission. Payment status changes remain the responsibility of the Payment Officer.
+
+---
+### Audit Logs
+
+The Administrator can view immutable audit records containing:
+
+* Timestamp
+* Actor
+* Action type
+* Target entity
+* Target entity ID
+* Description
+
+Audit logs are append-only.
+
+---
+
+### Reports
+
+The Administrator can export CSV reports including:
+
+* Revenue by period
+* Orders by fulfillment status
+* Orders by payment status
+* Top products
+* Top customers
+* Inventory summary
+
+---
+# 4.11 Features Outside the Current Use Case Scope
+
+The following features are **not part of the current implemented use case model**:
+
+| Feature | Status |
+| --- | --- |
+| Showroom / Appointment Booking | Removed from project scope |
+| Accountant Role | Replaced by Payment Officer |
+| Wishlist | Future Feature |
+| External Payment Gateway | Not integrated |
+| Transactional Email Service | Not part of current implementation |
+| Native Mobile Application | Not implemented |
+| Multi-vendor Marketplace | Not implemented |
+
+The Wishlist may be introduced in a future version, but it is not a current system use case.
+
+---
+
+# 4.12 Use Case to System Component Mapping
+
+| Use Case | Controller | Service Layer | Main Data |
+| --- | --- | --- | --- |
+| Customer Registration | `AccountController` | ASP.NET Core Identity | `AspNetUsers` |
+| Customer Login | `AccountController` | `SignInManager` | `AspNetUsers` |
+| Browse Catalog | `ProductsController` | `ProductService` | `Products`, `Categories` |
+| View Product | `ProductsController` | `ProductService` | `Products`, `ProductImages`, `Reviews` |
+| Manage Cart | `CartController` | `CartService` | `Carts`, `CartItems` |
+| Checkout | `OrdersController` | `OrderService` | `Orders`, `OrderItems`, `Products`, `CartItems` |
+| Track Order | `OrdersController` | `OrderService` | `Orders`, `OrderItems` |
+| Manage Addresses | `AccountController` | `AddressService` | `Addresses` |
+| Submit Review | `ProductsController` | `ReviewService` | `Reviews`, `Orders`, `OrderItems` |
+| Manage Products | `StoreManagerController` | `ProductService` | `Products`, `ProductImages` |
+| Manage Inventory | `StoreManagerController` | `InventoryService` | `Products` |
+| Update Fulfillment | `StoreManagerController` | `OrderService` | `Orders` |
+| Manage Payment | `PaymentController` | `PaymentService` | `Orders`, `PaymentLogs` |
+| View Payment History | `PaymentController` | `PaymentService` | `PaymentLogs`, `Orders` |
+| Manage Users | `AdminController` | `AdminService` | `AspNetUsers`, Identity Roles |
+| Moderate Reviews | `AdminController` | `AdminService` | `Reviews`, `AuditLogs` |
+| View Audit Logs | `AdminController` | `AdminService` | `AuditLogs` |
+| Export Reports | `AdminController` | `ReportService` | Orders, Products, Users |
+
+---
+## Summary
+
+The Ruqi Store use case model represents a **single-vendor furniture e-commerce system** implemented using a **monolithic ASP.NET Core MVC architecture**.
+
+The four official authenticated system roles are:
+
+1. **Customer**
+2. **Store Manager**
+3. **Payment Officer**
+4. **Administrator**
+
+An additional **Guest** actor represents unauthenticated visitors who can browse the public catalog and access registration and login functionality.
+
+Authentication and authorization are handled through **ASP.NET Core Identity**, while business rules are enforced in the Service Layer and persisted through **Entity Framework Core**.
+
+The current scope focuses on:
+
+* Product catalog browsing
+* Product details
+* Customer registration and login
+* Shopping cart
+* Checkout and order placement
+* Order tracking
+* Payment management
+* Payment history
+* Product reviews
+* Inventory management
+* Store management
+* User and role management
+* Audit logging
+* Administrative reporting
+
+Showroom appointments and the Accountant role are not part of the current Ruqi Store scope.
+
+---## Summary
+
+The Ruqi Store use case model represents a **single-vendor furniture e-commerce system** implemented using a **monolithic ASP.NET Core MVC architecture**.
+
+The four official authenticated system roles are:
+
+1. **Customer**
+2. **Store Manager**
+3. **Payment Officer**
+4. **Administrator**
+
+An additional **Guest** actor represents unauthenticated visitors who can browse the public catalog and access registration and login functionality.
+
+Authentication and authorization are handled through **ASP.NET Core Identity**, while business rules are enforced in the Service Layer and persisted through **Entity Framework Core**.
+
+The current scope focuses on:
+
+* Product catalog browsing
+* Product details
+* Customer registration and login
+* Shopping cart
+* Checkout and order placement
+* Order tracking
+* Payment management
+* Payment history
+* Product reviews
+* Inventory management
+* Store management
+* User and role management
+* Audit logging
+* Administrative reporting
+
+Showroom appointments and the Accountant role are not part of the current Ruqi Store scope.
+
+---
+[← Previous: Requirements Specification](./03-requirements.md) | [Back to Index](./00-index.md) | [Next: User Stories →](./05-user-stories.md)
