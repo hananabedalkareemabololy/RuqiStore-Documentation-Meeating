@@ -250,3 +250,186 @@ Each protected use case is restricted to the appropriate system role.
   * `BankTransfer`
 
 ---
+
+
+# 4.6 Fully Dressed Use Case — UC-012: Update Order Fulfillment Status
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-012 |
+| **Name** | Update Order Fulfillment Status |
+| **Primary Actor** | Store Manager |
+| **Controller** | `StoreManagerController` |
+| **Service** | `OrderService` |
+| **Description** | Store Manager updates the fulfillment progress of a customer order. |
+| **Preconditions** | Store Manager is authenticated and authorized; target order exists. |
+| **Postconditions** | Valid fulfillment status transition is saved with an updated timestamp. |
+| **Trigger** | Store Manager selects a new fulfillment status for an order. |
+
+---
+
+## Main Success Scenario
+
+| Step | Action |
+| --- | --- |
+| 1 | Store Manager opens `/Manager/Orders`. |
+| 2 | System displays available orders. |
+| 3 | Store Manager selects an order. |
+| 4 | Store Manager selects a new fulfillment status. |
+| 5 | `OrderService` validates the status transition. |
+| 6 | System updates `FulfillmentStatus`. |
+| 7 | System updates `UpdatedAt`. |
+| 8 | System saves the changes through EF Core. |
+| 9 | Customer sees the updated status on the next order-tracking request. |
+
+---
+
+## Valid Status Transitions
+
+```text
+Pending
+   ↓
+Processing
+   ↓
+Shipped
+   ↓
+Delivered
+```
+
+Cancellation is allowed from any status except `Delivered`:
+
+```text
+Pending ────────┐
+Processing ─────┤
+Shipped ────────┤
+                ↓
+            Cancelled
+```
+
+---
+
+## Exception Flows
+
+| ID | Condition | Result |
+| --- | --- | --- |
+| **E1** | Invalid transition | System rejects the request with `InvalidStatusTransitionException`. |
+| **E2** | Order not found | System returns a not-found result. |
+| **E3** | Unauthorized user | Access is denied by ASP.NET Core authorization. |
+
+> **Important:** Store Manager can update `FulfillmentStatus` only. `PaymentStatus` is managed exclusively by the Payment Officer.
+
+---
+
+# 4.7 Fully Dressed Use Case — UC-013: Manage Payment Status
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-013 |
+| **Name** | Manage Payment Status |
+| **Primary Actor** | Payment Officer |
+| **Controller** | `PaymentController` |
+| **Service** | `PaymentService` |
+| **Description** | Payment Officer reviews payment information and marks an order as Paid or Rejected. |
+| **Preconditions** | Payment Officer is authenticated and authorized; target order exists. |
+| **Postconditions** | Payment status is updated and an immutable `PaymentLog` record is created. |
+| **Trigger** | Payment Officer selects an unpaid order for payment processing. |
+
+---
+
+## Main Success Scenario — Mark Paid
+
+| Step | Action |
+| --- | --- |
+| 1 | Payment Officer opens the payment dashboard. |
+| 2 | System displays orders requiring payment review. |
+| 3 | Payment Officer selects an order. |
+| 4 | Payment Officer selects **Mark Paid**. |
+| 5 | `PaymentService` validates the current payment status. |
+| 6 | System changes `PaymentStatus` from `Unpaid` to `Paid`. |
+| 7 | System creates a `PaymentLog` containing the previous and new status. |
+| 8 | System saves the changes. |
+| 9 | Payment history reflects the new payment decision. |
+
+---
+
+## Alternative Flow — Reject Payment
+
+| Step | Action |
+| --- | --- |
+| 1 | Payment Officer selects **Reject**. |
+| 2 | System displays a rejection-reason field. |
+| 3 | Payment Officer enters the reason. |
+| 4 | `PaymentService` validates that the reason is not empty. |
+| 5 | System changes `PaymentStatus` to `Rejected`. |
+| 6 | System stores the rejection reason. |
+| 7 | System creates an immutable `PaymentLog`. |
+
+---
+
+## Business Rules
+
+* Only `PaymentOfficer` can change payment status.
+* `PaymentStatus` values are:
+  * `Unpaid`
+  * `Paid`
+  * `Rejected`
+* A rejection requires a non-empty rejection reason.
+* Every payment decision creates a `PaymentLog`.
+* `PaymentLog` is append-only.
+* Payment logs cannot be updated or deleted.
+
+---
+
+# 4.8 Fully Dressed Use Case — UC-008: Submit Verified Product Review
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-008 |
+| **Name** | Submit Verified Product Review |
+| **Primary Actor** | Customer |
+| **Controller** | `ProductsController` |
+| **Service** | `ReviewService` |
+| **Description** | A customer submits a review for a product they previously purchased and received. |
+| **Preconditions** | Customer is authenticated; customer has a Delivered order containing the product; customer has not already reviewed the product. |
+| **Postconditions** | Review is stored with `IsVerifiedPurchase = true` and becomes visible according to the system moderation state. |
+| **Trigger** | Customer selects the review option for an eligible purchased product. |
+
+---
+
+## Main Flow
+
+| Step | Action |
+| --- | --- |
+| 1 | Customer opens the product details page. |
+| 2 | System checks whether the customer has a Delivered order containing the product. |
+| 3 | System checks whether the customer has already reviewed the product. |
+| 4 | Customer enters a rating from 1 to 5 stars. |
+| 5 | Customer optionally enters a title and comment. |
+| 6 | Customer submits the review. |
+| 7 | `ReviewService` validates the review rules. |
+| 8 | System saves the review with `IsVerifiedPurchase = true`. |
+| 9 | System recalculates the product's average rating. |
+
+---
+
+## Exception Flows
+
+| ID | Condition | Result |
+| --- | --- | --- |
+| **E1** | No Delivered purchase | System rejects the review with `NoPurchaseFoundException`. |
+| **E2** | Customer already reviewed product | System rejects the review with `DuplicateReviewException`. |
+| **E3** | Invalid rating | System rejects the submitted rating. |
+
+---
+
+## Business Rules
+
+* Only authenticated customers can submit reviews.
+* A review requires a Delivered order containing the reviewed product.
+* Each customer can submit only one review per product.
+* Rating must be between 1 and 5.
+* Verified purchases are marked using `IsVerifiedPurchase = true`.
+* Review visibility is controlled through `IsVisible`.
+* Administrators can moderate reviews.
+
+---
