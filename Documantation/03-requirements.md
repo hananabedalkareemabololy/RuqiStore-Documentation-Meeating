@@ -41,13 +41,13 @@
 
 ### Order Management & Tracking
 
-| ID         | Requirement                                                                                                                                  | Priority |
-| :--------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
-| **FR-023** | The system shall allow customers to view their order history and order details.                                                              |   Must   |
-| **FR-024** | The system shall track fulfillment through the predefined status sequence: `Pending` → `Processing` → `Shipped` → `Delivered` → `Cancelled`. |   Must   |
-| **FR-025** | The system shall allow the Store Manager to update the fulfillment status of customer orders according to valid status transitions.          |   Must   |
-| **FR-026** | The system shall maintain `FulfillmentStatus` and `PaymentStatus` as independent order status values managed by their respective roles.      |   Must   |
-| **FR-027** | The system shall prevent customers from accessing orders belonging to other customers.                                                       |   Must   |
+| ID         | Requirement                                                                                                                                                                                                 | Priority |
+| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
+| **FR-023** | The system shall allow customers to view their order history and order details.                                                                                                                           |   Must   |
+| **FR-024** | The system shall track fulfillment using the predefined statuses `Pending`, `Processing`, `Shipped`, `Delivered`, and `Cancelled`, according to the defined valid status transitions.                   |   Must   |
+| **FR-025** | The system shall allow the Store Manager to update the fulfillment status of customer orders according to valid status transitions.                                                                       |   Must   |
+| **FR-026** | The system shall maintain `FulfillmentStatus` and `PaymentStatus` as independent order status values managed by their respective roles.                                                                    |   Must   |
+| **FR-027** | The system shall prevent customers from accessing orders belonging to other customers.                                                                                                                    |   Must   |
 
 ### Payment Management
 
@@ -118,13 +118,13 @@
 
 ### Performance & Scalability
 
-| ID          | Requirement                                                                                                                                     | Metric                         |
-| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------- |
-| **NFR-001** | The system shall process controller actions within the defined performance target under normal operating conditions.                            | 95th percentile < 500 ms       |
-| **NFR-002** | The system shall render fully styled application pages within the defined performance target under normal network conditions.                   | Page render < 2 seconds        |
-| **NFR-003** | The system shall support up to 200 concurrent users without significant service degradation.                                                    | Target: 200 concurrent users   |
-| **NFR-004** | The architecture shall use a Service Layer and Repository Pattern to maintain clean separation of concerns and support future scalability.      | Architectural compliance       |
-| **NFR-005** | The system shall use SQLite during development and support SQL Server as the production database without changing the application architecture. | EF Core provider configuration |
+| ID          | Requirement                                                                                                                                                 | Metric                                      |
+| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------ |
+| **NFR-001** | The system shall process controller actions within the project-defined performance target under normal operating conditions.                                  | Project-defined target: 95th percentile < 500 ms |
+| **NFR-002** | The system shall render fully styled application pages within the project-defined performance target under normal network conditions.                         | Project-defined target: page render < 2 seconds |
+| **NFR-003** | The system shall support the project-defined target for concurrent users without significant service degradation.                                            | Project-defined target: 200 concurrent users |
+| **NFR-004** | The architecture shall use a Service Layer and Repository Pattern to maintain clean separation of concerns and support future scalability.                   | Architectural compliance                     |
+| **NFR-005** | The system shall use SQLite during development and support SQL Server as the production database without changing the application architecture.             | EF Core provider configuration               |
 
 ### Security & Privacy
 
@@ -177,12 +177,12 @@
 
 ## 3.3 Prioritization Summary (MoSCoW)
 
-| Priority        | Count | Examples                                                                                                                                                                                    |
-| :-------------- | :---: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Priority        | Count | Examples                                                                                                                                                                             |
+| :-------------- | :---: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Must Have**   |   53  | Authentication, RBAC, product catalog, cart, atomic checkout, order tracking, payment management, verified reviews, inventory, administration, audit logs, bilingual UI, security controls. |
-| **Should Have** |   4   | Low-stock indicators, sales analytics, CSV reports, selected performance and usability enhancements.                                                                                        |
-| **Could Have**  |   4   | Wishlist, Redis caching, online payment gateway, AR visualization and native mobile applications as future enhancements.                                                                    |
-| **Won't Have**  |   1   | Showroom / appointment booking is excluded because Ruqi Store is an online-only furniture e-commerce system.                                                                                |
+| **Should Have** |   3   | Low-stock indicators, sales analytics, and CSV reports.                                                                                                                               |
+| **Could Have**  |   4   | Wishlist, Redis caching, online payment gateway, and AR visualization/native mobile applications as future enhancements.                                                             |
+| **Won't Have**  |   1   | Showroom / appointment booking is excluded because Ruqi Store is an online-only furniture e-commerce system.                                                                         |
 
 ---
 
