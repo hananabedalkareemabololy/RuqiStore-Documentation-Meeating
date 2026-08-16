@@ -433,3 +433,185 @@ Shipped ────────┤
 * Administrators can moderate reviews.
 
 ---
+# 4.9 Customer Data Isolation
+
+Customer-specific use cases must enforce data isolation through the Service Layer.
+
+A customer may access only their own:
+
+* Cart
+* Cart items
+* Orders
+* Order items
+* Addresses
+* Reviews
+
+The Service Layer validates:
+
+```text
+entity.UserId == currentUserId
+```
+
+If the requested resource belongs to another customer, the system denies access.
+
+This rule applies to:
+
+* Order details
+* Order history
+* Cart operations
+* Address management
+* Customer-specific review operations
+
+---
+
+# 4.10 Administrator Use Cases
+
+The Administrator has system-wide oversight and management capabilities.
+
+### User Management
+
+The Administrator can:
+
+* View users
+* Search users
+* Activate users
+* Deactivate users
+* Assign roles
+* Revoke roles
+
+The Administrator cannot modify their own permissions or deactivate their own account.
+
+---
+
+### Review Moderation
+
+The Administrator can:
+
+* View reviews
+* Filter reviews
+* Hide reviews by setting `IsVisible = false`
+
+Every review moderation action creates an `AuditLog`.
+
+---
+
+### Payment History
+
+The Administrator can:
+
+* View payment records
+* Filter payment records
+* Review payment status history
+
+The Administrator cannot change payment status. Payment status changes remain the responsibility of the Payment Officer.
+
+---
+
+### Audit Logs
+
+The Administrator can view immutable audit records containing:
+
+* Timestamp
+* Actor
+* Action type
+* Target entity
+* Target entity ID
+* Description
+
+Audit logs are append-only.
+
+---
+
+### Reports
+
+The Administrator can export CSV reports including:
+
+* Revenue by period
+* Orders by fulfillment status
+* Orders by payment status
+* Top products
+* Top customers
+* Inventory summary
+
+---
+
+# 4.11 Features Outside the Current Use Case Scope
+
+The following features are **not part of the current implemented use case model**:
+
+| Feature | Status |
+| --- | --- |
+| Showroom / Appointment Booking | Removed from project scope |
+| Accountant Role | Replaced by Payment Officer |
+| Wishlist | Future Feature |
+| External Payment Gateway | Not integrated |
+| Transactional Email Service | Not part of current implementation |
+| Native Mobile Application | Not implemented |
+| Multi-vendor Marketplace | Not implemented |
+
+The Wishlist may be introduced in a future version, but it is not a current system use case.
+
+---
+
+# 4.12 Use Case to System Component Mapping
+
+| Use Case | Controller | Service Layer | Main Data |
+| --- | --- | --- | --- |
+| Customer Registration | `AccountController` | ASP.NET Core Identity | `AspNetUsers` |
+| Customer Login | `AccountController` | `SignInManager` | `AspNetUsers` |
+| Browse Catalog | `ProductsController` | `ProductService` | `Products`, `Categories` |
+| View Product | `ProductsController` | `ProductService` | `Products`, `ProductImages`, `Reviews` |
+| Manage Cart | `CartController` | `CartService` | `Carts`, `CartItems` |
+| Checkout | `OrdersController` | `OrderService` | `Orders`, `OrderItems`, `Products`, `CartItems` |
+| Track Order | `OrdersController` | `OrderService` | `Orders`, `OrderItems` |
+| Manage Addresses | `AccountController` | `AddressService` | `Addresses` |
+| Submit Review | `ProductsController` | `ReviewService` | `Reviews`, `Orders`, `OrderItems` |
+| Manage Products | `StoreManagerController` | `ProductService` | `Products`, `ProductImages` |
+| Manage Inventory | `StoreManagerController` | `InventoryService` | `Products` |
+| Update Fulfillment | `StoreManagerController` | `OrderService` | `Orders` |
+| Manage Payment | `PaymentController` | `PaymentService` | `Orders`, `PaymentLogs` |
+| View Payment History | `PaymentController` | `PaymentService` | `PaymentLogs`, `Orders` |
+| Manage Users | `AdminController` | `AdminService` | `AspNetUsers`, Identity Roles |
+| Moderate Reviews | `AdminController` | `AdminService` | `Reviews`, `AuditLogs` |
+| View Audit Logs | `AdminController` | `AdminService` | `AuditLogs` |
+| Export Reports | `AdminController` | `ReportService` | Orders, Products, Users |
+
+---
+
+## Summary
+
+The Ruqi Store use case model represents a **single-vendor furniture e-commerce system** implemented using a **monolithic ASP.NET Core MVC architecture**.
+
+The four official authenticated system roles are:
+
+1. **Customer**
+2. **Store Manager**
+3. **Payment Officer**
+4. **Administrator**
+
+An additional **Guest** actor represents unauthenticated visitors who can browse the public catalog and access registration and login functionality.
+
+Authentication and authorization are handled through **ASP.NET Core Identity**, while business rules are enforced in the Service Layer and persisted through **Entity Framework Core**.
+
+The current scope focuses on:
+
+* Product catalog browsing
+* Product details
+* Customer registration and login
+* Shopping cart
+* Checkout and order placement
+* Order tracking
+* Payment management
+* Payment history
+* Product reviews
+* Inventory management
+* Store management
+* User and role management
+* Audit logging
+* Administrative reporting
+
+Showroom appointments and the Accountant role are not part of the current Ruqi Store scope.
+
+---
+
+[← Previous: Requirements Specification](./03-requirements.md) | [Back to Index](./00-index.md) | [Next: User Stories →](./05-user-stories.md)
