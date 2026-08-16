@@ -177,3 +177,79 @@ Each protected use case is restricted to the appropriate system role.
 > **Note:** Authentication is represented through the Customer Registration and Customer Login use cases and is implemented using ASP.NET Core Identity.
 
 ---
+
+
+# 4.5 Fully Dressed Use Case — UC-006: Checkout & Place Order
+
+| Field | Detail |
+| --- | --- |
+| **Use Case ID** | UC-006 |
+| **Name** | Checkout & Place Order |
+| **Primary Actor** | Customer |
+| **Controller** | `OrdersController` |
+| **Service** | `OrderService` |
+| **Description** | A customer reviews their cart, selects or enters a delivery address, selects a supported payment method, and places an order. |
+| **Preconditions** | Customer is authenticated; cart contains at least one item; products are active; sufficient stock is available. |
+| **Postconditions** | Order is created; stock is deducted; order item prices and names are snapshotted; cart is cleared; order confirmation is displayed. |
+| **Trigger** | Customer selects **"Proceed to Checkout"** and confirms the order. |
+
+---
+
+## Main Success Scenario
+
+| Step | Action |
+| --- | --- |
+| 1 | Customer opens the shopping cart. |
+| 2 | Customer selects **"Proceed to Checkout."** |
+| 3 | System displays saved delivery addresses. |
+| 4 | Customer selects an existing address or enters a new address. |
+| 5 | Customer selects a payment method: **Cash on Delivery** or **Bank Transfer**. |
+| 6 | System displays the order summary, including items, shipping, tax, and total amount. |
+| 7 | Customer confirms the order. |
+| 8 | `OrderService.PlaceOrderAsync()` starts an EF Core database transaction. |
+| 9 | System validates that all requested quantities are still available. |
+| 10 | System creates the `Order` with `FulfillmentStatus = Pending` and `PaymentStatus = Unpaid`. |
+| 11 | System creates `OrderItems` using the current product price as `UnitPrice` and the current product name as `ProductNameSnapshot`. |
+| 12 | System deducts the purchased quantities from product inventory. |
+| 13 | System clears the customer's cart items. |
+| 14 | System commits the transaction. |
+| 15 | System displays the order confirmation page with the generated `OrderId`. |
+
+---
+
+## Alternative Flows
+
+| ID | Condition | Steps |
+| --- | --- | --- |
+| **A1** | Customer has no saved address | Customer enters a new delivery address. The system validates and uses it for the order. |
+| **A2** | Customer changes cart quantity before checkout | System recalculates totals and validates the new quantity against current stock. |
+| **A3** | Customer selects a different saved address | System uses the selected address and creates an immutable delivery address snapshot for the order. |
+
+---
+
+## Exception Flows
+
+| ID | Condition | Steps |
+| --- | --- | --- |
+| **E1** | Empty cart | System rejects checkout and displays an `EmptyCartException` message. |
+| **E2** | Insufficient stock | System rejects the order and displays an `InsufficientStockException` message. |
+| **E3** | Product becomes unavailable | System prevents checkout for the inactive or unavailable product. |
+| **E4** | Database transaction failure | System rolls back the transaction. Stock and cart data remain unchanged. |
+
+---
+
+## Business Rules
+
+* Checkout must be executed inside an atomic EF Core transaction.
+* Product stock cannot become negative.
+* `OrderItem.UnitPrice` is a permanent price snapshot.
+* `OrderItem.ProductNameSnapshot` is a permanent product-name snapshot.
+* Historical order prices must never change when product prices are updated.
+* Cart items are removed only after successful order creation.
+* The order starts with `FulfillmentStatus = Pending`.
+* The order starts with `PaymentStatus = Unpaid`.
+* Supported payment methods are:
+  * `CashOnDelivery`
+  * `BankTransfer`
+
+---
