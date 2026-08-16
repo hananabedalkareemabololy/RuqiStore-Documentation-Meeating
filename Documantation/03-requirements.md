@@ -10,15 +10,15 @@
 | **FR-002** | The system shall enforce Role-Based Access Control (RBAC) with four defined roles: Customer, Store Manager, Payment Officer, and Administrator.                  |   Must   |
 | **FR-003** | The system shall allow authenticated users to manage their profile information and saved delivery addresses.                                                     |   Must   |
 | **FR-004** | The system shall assign the Customer role to newly registered customers and allow the Administrator to assign or revoke Store Manager and Payment Officer roles. |   Must   |
-| **FR-005** | The system shall maintain authenticated sessions using encrypted, HttpOnly, Secure, SameSite=Strict cookies managed by ASP.NET Core Identity.                    |   Must   |
+| **FR-005** | The system shall maintain authenticated sessions using secure HttpOnly, Secure, and SameSite=Strict cookies managed by ASP.NET Core Identity.                    |   Must   |
 | **FR-006** | The system shall lock a user account after 5 consecutive failed login attempts for a period of 15 minutes.                                                       |   Must   |
 
 ### Dynamic Furniture Product Catalog
 
 | ID         | Requirement                                                                                                                                                 | Priority |
 | :--------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
-| **FR-007** | The system shall display an active, categorized furniture product catalog accessible to guests and authenticated users.                                     |   Must   |
-| **FR-008** | The system shall allow users to search products by keyword and filter products by category, price range, material, and stock availability.                  |   Must   |
+| **FR-007** | The system shall display an active, categorized furniture product catalog accessible to authenticated users.                                               |   Must   |
+| **FR-008** | The system shall allow authenticated users to search products by keyword and filter products by category, price range, material, and stock availability.    |   Must   |
 | **FR-009** | The system shall display detailed product information including name, SKU, price, material, dimensions, weight, stock status, images, and verified reviews. |   Must   |
 | **FR-010** | The system shall allow the Store Manager to create and update furniture products and manage their active status.                                            |   Must   |
 | **FR-011** | The system shall allow the Store Manager to create, rename, reorder, activate, and deactivate furniture categories.                                         |   Must   |
@@ -51,8 +51,8 @@
 
 ### Payment Management
 
-| ID         | Requirement                                                                                                                                | Priority |
-| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------- | :------: |
+| ID          | Requirement                                                                                                                                | Priority |
+| :---------- | :----------------------------------------------------------------------------------------------------------------------------------------- | :------: |
 | **FR-028** | The system shall allow the Payment Officer to review customer orders and payment information.                                              |   Must   |
 | **FR-029** | The system shall allow the Payment Officer to mark an order as `Paid` or `Rejected`.                                                       |   Must   |
 | **FR-030** | The system shall require a non-empty rejection reason when a payment is rejected.                                                          |   Must   |
@@ -64,18 +64,18 @@
 | ID         | Requirement                                                                                                                       | Priority |
 | :--------- | :-------------------------------------------------------------------------------------------------------------------------------- | :------: |
 | **FR-033** | The system shall allow customers to submit product reviews only when they have a delivered order containing the reviewed product. |   Must   |
-| **FR-034** | The system shall allow a customer to submit only one review per product.                                                          |   Must   |
-| **FR-035** | The system shall support ratings from 1 to 5 stars with an optional review title and comment.                                     |   Must   |
-| **FR-036** | The system shall mark qualifying reviews as verified purchases and recalculate the product's average rating after submission.     |   Must   |
-| **FR-037** | The system shall allow the Administrator to moderate product reviews by hiding inappropriate reviews.                             |   Must   |
+| **FR-034** | The system shall allow a customer to submit only one review per product.                                                         |   Must   |
+| **FR-035** | The system shall support ratings from 1 to 5 stars with an optional review title and comment.                                    |   Must   |
+| **FR-036** | The system shall mark qualifying reviews as verified purchases and recalculate the product's average rating after submission.    |   Must   |
+| **FR-037** | The system shall allow the Administrator to moderate product reviews by hiding inappropriate reviews.                            |   Must   |
 
 ### Store Manager Management
 
 | ID         | Requirement                                                                                                                      | Priority |
 | :--------- | :------------------------------------------------------------------------------------------------------------------------------- | :------: |
 | **FR-038** | The system shall provide the Store Manager with a dashboard containing product, inventory, pending order, and sales information. |   Must   |
-| **FR-039** | The system shall allow the Store Manager to update product stock while preventing stock quantities from becoming negative.       |   Must   |
-| **FR-040** | The system shall provide low-stock indicators for products below the configured stock threshold.                                 |  Should  |
+| **FR-039** | The system shall allow the Store Manager to update product stock while preventing stock quantities from becoming negative.      |   Must   |
+| **FR-040** | The system shall provide low-stock indicators for products below the configured stock threshold.                                |  Should  |
 | **FR-041** | The system shall allow the Store Manager to view and filter orders by fulfillment status.                                        |   Must   |
 | **FR-042** | The system shall provide sales analytics including revenue by period, units sold by category, top products, and inventory value. |  Should  |
 
@@ -172,18 +172,37 @@
 | **NFR-030** | The system shall use Dependency Injection for services, repositories, and database components.                                                                 | ASP.NET Core DI                |
 | **NFR-031** | The system shall use Razor Views with strongly typed ViewModels for server-rendered pages.                                                                     | `.cshtml` / ViewModels         |
 | **NFR-032** | The system shall use version-controlled EF Core migrations for database schema evolution.                                                                      | Code-First migrations          |
-
 ---
 
 ## 3.3 Prioritization Summary (MoSCoW)
 
-| Priority        | Count | Examples                                                                                                                                                                             |
-| :-------------- | :---: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Must Have**   |   53  | Authentication, RBAC, product catalog, cart, atomic checkout, order tracking, payment management, verified reviews, inventory, administration, audit logs, bilingual UI, security controls. |
-| **Should Have** |   3   | Low-stock indicators, sales analytics, and CSV reports.                                                                                                                               |
-| **Could Have**  |   4   | Wishlist, Redis caching, online payment gateway, and AR visualization/native mobile applications as future enhancements.                                                             |
-| **Won't Have**  |   1   | Showroom / appointment booking is excluded because Ruqi Store is an online-only furniture e-commerce system.                                                                         |
+| Priority        | Count | Examples |
+| :-------------- | :---: | :------- |
+| **Must Have**   |   49  | Authentication, RBAC, product catalog, cart, atomic checkout, order tracking, payment management, verified reviews, inventory, administration, audit logs, bilingual UI, and security controls. |
+| **Should Have** |   3   | Low-stock indicators, sales analytics, and CSV reports. |
+| **Could Have**  |   4   | Wishlist, Redis caching, online payment gateway, and AR visualization/native mobile applications as future enhancements. |
+| **Won't Have**  |   0   | No additional current requirement is classified as Won't Have. Features outside the current scope are documented separately below. |
+
+> **Note:** Showroom / appointment booking is excluded from the current system scope and is documented as an out-of-scope feature rather than a functional requirement.
 
 ---
 
-[← Previous: Stakeholder Analysis](./02-stakeholder-analysis.md) | [Back to Index](./00-index.md) | [Next: Use Case Model & Descriptions →](./04-use-case-model.md)
+## Out-of-Scope Features
+
+The following features are not part of the current Ruqi Store implementation:
+
+| Feature | Status |
+| :------ | :----- |
+| Showroom / Appointment Booking | Removed from project scope |
+| Accountant Role | Replaced by Payment Officer |
+| Wishlist | Future Feature |
+| External Payment Gateway | Not integrated |
+| Transactional Email Service | Not part of current implementation |
+| Native Mobile Application | Not implemented |
+| Multi-vendor Marketplace | Not implemented |
+
+The Wishlist, external payment gateway, AR visualization, and native mobile application may be considered for future versions, but they are not part of the current implemented system.
+
+---
+
+[← Previous: Stakeholder Analysis](./02-stakeholder-analysis.md) | [Back to Index](./00-index.md) | [Next: Use Case Model & Descriptions →](./04-use-case-model.md)]
