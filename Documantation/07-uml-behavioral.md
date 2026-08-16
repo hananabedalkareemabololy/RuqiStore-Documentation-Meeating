@@ -161,9 +161,9 @@ sequenceDiagram
     P->>UI: Open Payment Dashboard
     UI->>PC: GET /Payment/Dashboard
 
-    PC->>PS: GetPendingPaymentsAsync()
+    GetUnpaidPaymentsAsync()
     PS->>DB: Load orders and payment records
-    DB-->>PS: Pending payment records
+    DB-->>PS: Unpaid payment records
     PS-->>PC: Payment records
     PC-->>UI: Render payment dashboard
 
@@ -487,7 +487,7 @@ flowchart TD
 
 ### Administrator Rules
 
-- All Admin pages are protected by `[Authorize(Roles = "Admin")]`.
+- All Admin pages are protected by `[Authorize(Roles = "Administrator")]`.
 - Administrators cannot deactivate their own account.
 - Administrators cannot modify their own permissions.
 - User deactivation is soft deactivation; user data is preserved.
