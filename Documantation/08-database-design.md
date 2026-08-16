@@ -41,19 +41,18 @@ erDiagram
         boolean is_active
     }
 
-    PRODUCTS {
-        int product_id PK
-        string name
-        string product_name
-        string sku UK
-        decimal price
-        int stock_quantity
-        string material
-        string dimensions
-        boolean is_active
-        int category_id FK
-        datetime created_at
-    }
+PRODUCTS {
+    int product_id PK
+    string name
+    string sku UK
+    decimal price
+    int stock_quantity
+    string material
+    string dimensions
+    boolean is_active
+    int category_id FK
+    datetime created_at
+}
 
     PRODUCT_IMAGES {
         int image_id PK
@@ -114,14 +113,15 @@ erDiagram
         datetime processed_at
     }
 
-    PAYMENT_LOGS {
-        int payment_log_id PK
-        int order_id FK
-        string user_id FK
-        string action
-        decimal amount
-        datetime timestamp
-    }
+PAYMENT_LOGS {
+    int payment_log_id PK
+    int order_id FK
+    string user_id FK
+    string action
+    string reason
+    decimal amount
+    datetime timestamp
+}
 
     PRODUCT_REVIEWS {
         int review_id PK
@@ -133,14 +133,15 @@ erDiagram
         datetime created_at
     }
 
-    AUDIT_LOGS {
-        int audit_log_id PK
-        string user_id FK
-        string action
-        string entity_name
-        int entity_id
-        datetime timestamp
-    }
+AUDIT_LOGS {
+    int audit_log_id PK
+    string user_id FK
+    string action
+    string target_entity_type
+    string target_entity_id
+    string description
+    datetime timestamp
+}
 ```
 ## 8.2 Normalized Schema (3NF)
 
@@ -304,7 +305,7 @@ The `unit_price` and `product_name_snapshot` fields preserve historical order in
 | payment_id | INT | PK, AUTO_INCREMENT | Unique payment identifier |
 | order_id | INT | FK → orders, UNIQUE | Associated order |
 | amount | DECIMAL(18,2) | NOT NULL | Payment amount |
-| payment_status | VARCHAR(50) | NOT NULL | Pending, Paid, or Rejected |
+| payment_status | VARCHAR(50) | NOT NULL | Unpaid, Paid, or Rejected |
 | processed_at | DATETIME2 | NULL | Payment processing timestamp |
 
 ### payment_logs
@@ -317,7 +318,7 @@ The `unit_price` and `product_name_snapshot` fields preserve historical order in
 | action | VARCHAR(250) | NOT NULL | Payment operation performed |
 | amount | DECIMAL(18,2) | NULL | Amount involved in the operation |
 | timestamp | DATETIME2 | NOT NULL | Action timestamp |
-
+|reason | NVARCHAR(500) | NULL | Rejection reason when applicable |
 Payment logs are **append-only** and cannot be edited or deleted through normal application operations.
 
 ---
