@@ -39,7 +39,7 @@
 
 ### US-002: Secure Login
 
-> As a **registered user**, I want to **log in securely using my email and password** so that I can **access features according to my assigned role**.
+> As a **guest or registered user**, I want to **log in securely using my email and password** so that I can **access features according to my assigned role**.
 
 **Acceptance Criteria:**
 
@@ -53,17 +53,17 @@
 
 ---
 
-### US-003: Manage Profile & Addresses
+### US-003: Manage Profile
 
-> As an **authenticated customer**, I want to **manage my profile and saved delivery addresses** so that I can **use accurate information during checkout**.
+> As an **authenticated customer**, I want to **manage my profile information** so that I can **keep my account information accurate**.
 
 **Acceptance Criteria:**
 
-- **Given** I am authenticated, **when** I open my profile, **then** I can update my permitted profile information.
-- **Given** I am authenticated, **when** I open the address book, **then** I can view my saved addresses.
-- **Given** I have fewer than 5 saved addresses, **when** I add a new address, **then** the address is saved successfully.
-- **Given** I already have 5 saved addresses, **when** I attempt to add another address, **then** the system rejects the operation.
-- **Given** I update or delete an address, **then** the operation only affects my own address records.
+**Acceptance Criteria:**
+
+- **Given** I am authenticated, **when** I open my profile, **then** I can view my permitted profile information.
+- **Given** I am authenticated, **when** I update my profile information with valid data, **then** the system saves the changes successfully.
+- **Given** I update my profile, **then** the operation only affects my own profile information.
 
 **Story Points:** 3 | **Priority:** Should
 
